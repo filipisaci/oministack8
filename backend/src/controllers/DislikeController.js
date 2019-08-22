@@ -1,0 +1,26 @@
+const Dev = require('../models/Dev');
+
+
+module.exports = {
+    async store(req, res) {
+        const { user } = req.headers;
+        const { devId } = req.params;
+
+        // Pegar do banco a instancia de cada obj
+        //const loggedDev = Dev.findById(user).then(bla => console.log(bla)).catch(test => console.log(test));
+        const loggedDev = await Dev.findById(user);
+        const targetDev = await Dev.findById(devId);
+
+        if (!targetDev) {
+            return res.status(400).json({ error: 'Dev not exists' });
+        }
+
+        loggedDev.dislikes.push(targetDev._id);
+
+        await loggedDev.save();
+
+        return res.json({
+            sendUser: loggedDev,
+        })
+    }
+};
